@@ -10,7 +10,7 @@
 
 <script>
 import {initWalletConnect,web3modal} from "../walletConnect/myWallet"
-import { signMessage,disconnect, switchNetwork, readContract, writeContract,waitForTransaction } from '@wagmi/core'
+import { signMessage,disconnect, switchNetwork, readContract, getContract,getProvider,getAccount,waitForTransaction } from '@wagmi/core'
 import {abi, getAddress} from "../contract/finananceContractABI"
 import toast from "../elements/toast"
 import axios from "axios"
@@ -49,7 +49,7 @@ console.log(signature)
       return this.toast('Enter Airdrop id','error')
     }
     try{
-    let data =[]       
+    let allProjects =[]       
     const getWalletConnect = localStorage.getItem('walletconnect')
     console.log(JSON.parse(getWalletConnect).accounts[0])
     const parsedData = JSON.parse(getWalletConnect)
@@ -57,8 +57,8 @@ console.log(signature)
     console.log(walletAddress)
      const res = await axios.get(`https://bank.influencebackend.xyz/bank/check/${walletAddress}`)
      console.log(res)
-      data = [...res.data]
-      const filteredObject = data.find((x)=>{
+      allProjects = [...res.data]
+      const filteredObject = allProjects.find((x)=>{
         return x._id === this.airdropAddress
       })
       console.log(filteredObject)
@@ -95,19 +95,46 @@ console.log(signature)
     console.log("index",this.filteredObject.treeIndex-1)
     console.log("amount",amountInWei)
     console.log("getProofFromApi",getProofFromApi)
-    const {hash} = await writeContract({
-      mode:'recklesslyUnprepared',
-      address:address,
-      abi:abi,
-      functionName:'withdraw',
-      args:[this.filteredObject.treeIndex-1,walletAddress,amountInWei,getProofFromApi]}
-      )    
+    // const {hash} = await writeContract({
+    //   mode:'recklesslyUnprepared',
+    //   address:address,
+    //   abi:abi,
+    //   functionName:'withdraw',
+    //   args:[this.filteredObject.treeIndex-1,walletAddress,amountInWei,getProofFromApi]}
+    //   )    
+    //   console.log(hash)
+    //   const waitResp = await waitForTransaction({
+    //     hash:hash
+    //   })
+      const provider = getProvider({
+        chainId:this.chainId
+      })
+      console.log(provider)
+      const account = getAccount();
+console.log(account)
+  const signer = await account.connector?.getSigner();  
+console.log(signer)
+      // console.log(refetch)
+      const contract = getContract({
+        address:address,
+        abi:abi,    
+        signerOrProvider:signer    
+      })
+      console.log(contract)
+      const treeIndex =this.filteredObject.treeIndex-1
+      const {hash} = await contract.functions.withdraw(
+        treeIndex,
+        walletAddress,
+        amountInWei,
+        getProofFromApi
+      )
       console.log(hash)
       const waitResp = await waitForTransaction({
         hash:hash
       })
       console.log(waitResp)
-      console.log(waitResp.status)
+      // console.log(waitResp)
+      // console.log(waitResp.status)
       if(waitResp.status===1){
        return this.toast("Reward claimed successfully! check your wallet",'success')
       }
