@@ -10,7 +10,7 @@
 
 <script>
 import {initWalletConnect,web3modal} from "../walletConnect/myWallet"
-import { signMessage,disconnect, switchNetwork, readContract, getContract,getProvider,getAccount,waitForTransaction } from '@wagmi/core'
+import { signMessage,disconnect, switchNetwork, readContract, getContract,getProvider,getAccount } from '@wagmi/core'
 import {abi, getAddress} from "../contract/finananceContractABI"
 import toast from "../elements/toast"
 import axios from "axios"
@@ -121,21 +121,20 @@ console.log(signer)
         signerOrProvider:signer    
       })
       console.log(contract)
+      console.log(this.filteredObject.treeIndex)
       const treeIndex =this.filteredObject.treeIndex-1
-      const {hash} = await contract.functions.withdraw(
+      console.log(treeIndex)
+      const resp = await contract.functions.withdraw(
         treeIndex,
         walletAddress,
         amountInWei,
         getProofFromApi
       )
-      console.log(hash)
-      const waitResp = await waitForTransaction({
-        hash:hash
-      })
-      console.log(waitResp)
-      // console.log(waitResp)
-      // console.log(waitResp.status)
-      if(waitResp.status===1){
+      console.log(resp)
+      console.log(resp.hash)
+      const response = await resp.wait();
+      console.log(response)
+      if(response.status===1){
        return this.toast("Reward claimed successfully! check your wallet",'success')
       }
     }
