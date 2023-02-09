@@ -14,6 +14,7 @@ import { signMessage,disconnect, switchNetwork, readContract, getContract,getPro
 import {abi, getAddress} from "../contract/finananceContractABI"
 import toast from "../elements/toast"
 import axios from "axios"
+// import {ethers} from "ethers"
 export default {
   name: 'HelloWorld',  
   data(){
@@ -128,7 +129,9 @@ console.log(signer)
         treeIndex,
         walletAddress,
         amountInWei,
-        getProofFromApi
+        getProofFromApi,{
+        gasLimit: 250000
+        }
       )
       console.log(resp)
       console.log(resp.hash)
