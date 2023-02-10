@@ -48,12 +48,23 @@ console.log(signature)
   async claimReward() {
     if(this.airdropAddress===""){
       return this.toast('Enter Airdrop id','error')
-    }
+    }    
     try{
     let allProjects =[]       
     const getWalletConnect = localStorage.getItem('walletconnect')
     console.log(JSON.parse(getWalletConnect).accounts[0])
     const parsedData = JSON.parse(getWalletConnect)
+    const isMetamask = parsedData.peerMeta.name
+    console.log(isMetamask)
+    if(isMetamask === 'MetaMask'){
+    const url = "metamask://dapp/google.co"
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_self";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    }
     const walletAddress = parsedData.accounts[0]
     console.log(walletAddress)
      const res = await axios.get(`https://bank.influencebackend.xyz/bank/check/${walletAddress}`)
