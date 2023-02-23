@@ -5,6 +5,14 @@
     <b-button class="ml-2" variant="info" @click="connectWallet">Connect</b-button>        
     <b-button class="ml-2" variant="success" @click="claimReward">claimReward</b-button>
     <b-button class="ml-2" variant="danger" @click="disconnectWallet">Disconnect</b-button>
+    <hf-pop-up
+      id="modal-1"
+  Header="Sign Message">   
+ <p>{{message_sign}}</p>
+    <b-button class="mt-2 ml-5 mr-4 text-center" variant="info" @click="sign"
+      >Sign</b-button
+    >    
+  </hf-pop-up>
   </div>
 </template>
 
@@ -14,15 +22,17 @@ import { signMessage,disconnect, switchNetwork, readContract, getContract,getPro
 import {abi, getAddress} from "../contract/finananceContractABI"
 import toast from "../elements/toast"
 import axios from "axios"
+import HfPopUp from '@/elements/HfPopUp.vue'
 // import {ethers} from "ethers"
 export default {
+  components:{HfPopUp},
   name: 'HelloWorld',  
   data(){
     return{
-      airdropAddress:'',
+      airdropAddress:'a',
       filteredObject:null,
       chainId:0,
-      message_sign:'',
+      message_sign:'You are Signing this message to ensure your participation in this event',
       signature:'',
       walletAddress:''
     }
@@ -36,47 +46,60 @@ export default {
         return this.toast('Enter Airdrop id','error')
     }  
     console.log('connect')    
-  await web3modal.openModal();
-  if(this.walletAddress==="" && localStorage.getItem('wagmi.store')){          
+  
+  if(this.walletAddress==="" && localStorage.getItem('wagmi.store')){  
+    console.log('in if')        
           const getDataFromLocalStorage = localStorage.getItem('wagmi.store')          
           const parsed = JSON.parse(getDataFromLocalStorage) 
           // eslint-disable-next-line         
-          if(parsed.state.data.hasOwnProperty('account')){            
+          if(parsed.state.data.hasOwnProperty('account')){           
             if(this.signature===""){
-            await this.sign(parsed.state.data.account)   
-            web3modal.closeModal()
-            }           
-          }                 
-        }   
+            this.$root.$emit('bv::show::modal','modal-1');               
+            }   
+            else{
+              console.log('in else')
+              await web3modal.openModal();
+            }        
+          }    
+          else{
+            await web3modal.openModal()
+          }             
+        }
+        else{
+          await web3modal.openModal();
+        }
+  // await web3modal.openModal();   
   watchAccount(async account=>{
     if(account.isConnected){
       console.log(account)
       this.walletAddress = account.address
-
-      await this.sign(this.walletAddress)
+      this.$root.$emit('bv::show::modal','modal-1');
     }
   })
     },
-    async sign(address) {     
-      console.log('in sign')
-      const message = "You are Signing this message to ensure your participation in this event"
-      this.message_sign = message;
+    async sign() {
+      const getDataFromLocalStorage = localStorage.getItem('wagmi.store')
+          const parsed = JSON.parse(getDataFromLocalStorage).state.data.account
+          console.log(parsed)  
+      console.log('in sign')      
       this.signature = await signMessage({
         message:this.message_sign
       })
-      const signingKey = await fetchSigner()
+     const signingKey = await fetchSigner()
       console.log(signingKey)
       const resolvedAddress = signingKey._address
       console.log(resolvedAddress)
-      if(address === resolvedAddress){
+      if(parsed === resolvedAddress){
       console.log(resolvedAddress)
+      this.$root.$emit('bv::hide::modal','modal-1');
+      // web3modal.closeModal()
+      this.toast('Connected and verified!','success')
       }              
     },
    async disconnectWallet() {
     await disconnect();
     this.walletAddress=""
-    this.signature=""
-    this.message_sign=""
+    this.signature=""    
     this.toast('Disconnected','success')
     },
   async claimReward() {
