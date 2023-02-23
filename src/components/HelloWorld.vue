@@ -10,7 +10,7 @@
 
 <script>
 import {initWalletConnect,web3modal} from "../walletConnect/myWallet"
-import { signMessage,disconnect, switchNetwork, readContract, getContract,getProvider,getAccount } from '@wagmi/core'
+import { signMessage,disconnect, switchNetwork, readContract, getContract,getProvider,getAccount, watchAccount,fetchSigner } from '@wagmi/core'
 import {abi, getAddress} from "../contract/finananceContractABI"
 import toast from "../elements/toast"
 import axios from "axios"
@@ -21,7 +21,10 @@ export default {
     return{
       airdropAddress:'',
       filteredObject:null,
-      chainId:0
+      chainId:0,
+      message_sign:'',
+      signature:'',
+      walletAddress:''
     }
   },
   mounted() {
@@ -34,17 +37,48 @@ export default {
     }  
     console.log('connect')    
   await web3modal.openModal();
+  if(this.walletAddress==="" && localStorage.getItem('wagmi.store')){          
+          const getDataFromLocalStorage = localStorage.getItem('wagmi.store')          
+          const parsed = JSON.parse(getDataFromLocalStorage) 
+          // eslint-disable-next-line         
+          if(parsed.state.data.hasOwnProperty('account')){            
+            if(this.signature===""){
+            await this.sign(parsed.state.data.account)   
+            web3modal.closeModal()
+            }           
+          }                 
+        }   
+  watchAccount(async account=>{
+    if(account.isConnected){
+      console.log(account)
+      this.walletAddress = account.address
+
+      await this.sign(this.walletAddress)
+    }
+  })
+    },
+    async sign(address) {     
+      console.log('in sign')
+      const message = "You are Signing this message to ensure your participation in this event"
+      this.message_sign = message;
+      this.signature = await signMessage({
+        message:this.message_sign
+      })
+      const signingKey = await fetchSigner()
+      console.log(signingKey)
+      const resolvedAddress = signingKey._address
+      console.log(resolvedAddress)
+      if(address === resolvedAddress){
+      console.log(resolvedAddress)
+      }              
     },
    async disconnectWallet() {
     await disconnect();
+    this.walletAddress=""
+    this.signature=""
+    this.message_sign=""
     this.toast('Disconnected','success')
     },
-   async sign(){
-    const signature = await signMessage({
-  message: 'Hi there I am from Fyre',
-})
-console.log(signature)
-   },
   async claimReward() {
     if(this.airdropAddress===""){
       return this.toast('Enter Airdrop id','error')
@@ -56,14 +90,21 @@ console.log(signature)
     const parsedData = JSON.parse(getWalletConnect)
     const isMetamask = parsedData.peerMeta.name
     console.log(isMetamask)
-    if(isMetamask === 'MetaMask'){
-    const url = "metamask://dapp/google.co"
-    const a = document.createElement("a");
-    a.href = url;
-    a.target = "_self";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    if(isMetamask === 'MetaMask'){      
+            var userAgent = navigator.userAgent.toLowerCase();
+            var Android = userAgent.indexOf("android") > -1;              
+            const isIos = this.iOS()
+            console.log(Android)
+            console.log(isIos)
+            if(Android === true || isIos === true){
+              const url = "metamask://dapp/google.co"
+              const a = document.createElement("a");
+              a.href = url;
+              a.target = "_self";
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+            }                
     }
     const walletAddress = parsedData.accounts[0]
     console.log(walletAddress)
@@ -157,6 +198,12 @@ console.log(signer)
       this.toast(e.message,'error')    
     }
   },
+  iOS() {
+  return [    
+    'iPhone',   
+  ].includes(navigator.platform)    
+},
+
   async getProof(projectId,walletAddress) {
       const proof = await axios.get(`https://bank.influencebackend.xyz/proof/${projectId}/${walletAddress}`)
       return proof?.data?.merkleProof      

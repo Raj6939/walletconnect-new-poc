@@ -1,4 +1,4 @@
-import { configureChains, createClient, watchAccount, watchNetwork } from '@wagmi/core';
+import { configureChains, createClient } from '@wagmi/core';
 import { goerli, mainnet, polygon, polygonMumbai } from '@wagmi/core/chains';
 // import toast from "../elements/toast"
 // import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect';
@@ -45,18 +45,18 @@ const initWalletConnect = () => {
         ethereumClient
     );
 
-    watchNetwork(network => {
-        console.log(network)
-        // if (network.chains.length !== 0) {
-        //     console.log(network.chains)
-        //     const isChainValid = network.chains[0].id === network?.chain?.id;
-        //     console.log(isChainValid)
-        // }
-    });
-     watchAccount(account =>{        
-        console.log(account)
-        // toast('connected','success')
-     })
+    // watchNetwork(network => {
+    //     console.log(network)
+    //     // if (network.chains.length !== 0) {
+    //     //     console.log(network.chains)
+    //     //     const isChainValid = network.chains[0].id === network?.chain?.id;
+    //     //     console.log(isChainValid)
+    //     // }
+    // });
+    //  watchAccount(account =>{        
+    //     console.log(account)
+    //     // toast('connected','success')
+    //  })
     // switchNetwork(chain =>{
     //     console.log(chain)
     // });
