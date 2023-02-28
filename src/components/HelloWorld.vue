@@ -81,7 +81,32 @@ export default {
       const getDataFromLocalStorage = localStorage.getItem('wagmi.store')
           const parsed = JSON.parse(getDataFromLocalStorage).state.data.account
           console.log(parsed)  
-      console.log('in sign')      
+      console.log('in sign')
+      const getWalletConnect = localStorage.getItem('walletconnect')
+    if(getWalletConnect !== null){
+      console.log(getWalletConnect)
+    console.log(JSON.parse(getWalletConnect).accounts[0])
+    const parsedData = JSON.parse(getWalletConnect)
+    const isMetamask = parsedData.peerMeta.name
+    console.log(isMetamask)
+    if(isMetamask === 'MetaMask'){
+      var userAgent = navigator.userAgent.toLowerCase();
+      var Android = userAgent.indexOf("android") > -1;              
+      const isIos = this.iOS()
+      console.log(Android)
+      console.log(isIos)
+      console.log(web3modal)
+      if(Android === true || isIos === true){        
+        const url = "metamask://dapp/google.co"
+        const a = document.createElement("a");
+        a.href = url;
+        a.target = "_self";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+    }
+    }      
       this.signature = await signMessage({
         message:this.message_sign
       })
