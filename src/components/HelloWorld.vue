@@ -104,12 +104,15 @@ export default {
         document.body.appendChild(a);
         a.click();
         a.remove();
+        this.signature = await signMessage({
+        message:this.message_sign
+      })
       }
     }
     }      
-      this.signature = await signMessage({
-        message:this.message_sign
-      })
+      // this.signature = await signMessage({
+      //   message:this.message_sign
+      // })
      const signingKey = await fetchSigner()
       console.log(signingKey)
       const resolvedAddress = signingKey._address
