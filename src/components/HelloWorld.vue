@@ -90,29 +90,20 @@ export default {
     const isMetamask = parsedData.peerMeta.name
     console.log(isMetamask)
     if(isMetamask === 'MetaMask'){
-      var userAgent = navigator.userAgent.toLowerCase();
-      var Android = userAgent.indexOf("android") > -1;              
-      const isIos = this.iOS()
-      console.log(Android)
-      console.log(isIos)
-      console.log(web3modal)
-      if(Android === true || isIos === true){        
-        const url = "metamask://dapp/google.co"
-        const a = document.createElement("a");
-        a.href = url;
-        a.target = "_self";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        this.signature = await signMessage({
+    if(/iPhone/i.test(navigator.userAgent)){
+    const url = "metamask://dapp/google.co"
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_self";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    }
+    }
+    }          
+    this.signature = await signMessage({
         message:this.message_sign
       })
-      }
-    }
-    }      
-      // this.signature = await signMessage({
-      //   message:this.message_sign
-      // })
      const signingKey = await fetchSigner()
       console.log(signingKey)
       const resolvedAddress = signingKey._address
