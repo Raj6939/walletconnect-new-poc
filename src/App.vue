@@ -23,15 +23,7 @@ export default {
       {
         property: 'og:image',
         content: 'https://media.licdn.com/dms/image/C4D03AQGM3Z9dL6ZkoQ/profile-displayphoto-shrink_800_800/0/1655765136300?e=2147483647&v=beta&t=LuvfT4R4SwW7XmMEXo2e9SIrQ5uKlMs_2saK2Gi_iOI'
-      },
-      {
-        property: 'og:url',
-        content: 'URL of your webpage'
-      },
-      {
-        property: 'og:type',
-        content: 'website'
-      }
+      },      
     ]
   }
 }
