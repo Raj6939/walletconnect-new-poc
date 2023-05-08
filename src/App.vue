@@ -22,8 +22,16 @@ export default {
       },
       {
         property: 'og:image',
-        content: 'https://media.licdn.com/dms/image/C4D03AQGM3Z9dL6ZkoQ/profile-displayphoto-shrink_800_800/0/1655765136300?e=2147483647&v=beta&t=LuvfT4R4SwW7XmMEXo2e9SIrQ5uKlMs_2saK2Gi_iOI'
-      },      
+        content: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTN2vVVG2BOns1aicnn0wKmKn3aYtHCcBiysWlpz_c&s'
+      },  
+      {
+        property: 'og:url',
+        content: 'https://joyful-donut-505014.netlify.app/'
+      },
+      {
+        property: 'og:type',
+        content: 'website'
+      }    
     ]
   }
 }
